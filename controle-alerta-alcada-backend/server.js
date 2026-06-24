@@ -1,15 +1,8 @@
-import express from 'express'
-import 'dotenv/config'
-// import userRoutes from './routes/user.routes.js'
-import emailRoutes from './routes/email.routes.js'
+// src/server.js
+import app from './app.js';
 
-const app = express()
+const PORT = 3000;
 
-app.use(express.json())
-app.use('/api', emailRoutes)
-
-app.use('/api', userRoutes)
-
-app.listen(3000, () => {
-  console.log('Servidor rodando na porta 3000')
-})
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
