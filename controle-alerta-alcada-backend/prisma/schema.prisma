@@ -5,31 +5,36 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  schemas  = ["dw"]
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model oc_email_log {
-  id              Int       @id @default(autoincrement())
-  cd_solicitacao  Int
-  controle_sc     String?   @db.VarChar(10)
-  dt_criacao_sc   DateTime? @db.Timestamp(6)
-  cd_ordem_compra String    @unique(map: "uq_cd_ordem_compra") @db.VarChar(20)
-  controle_oc     String?   @db.VarChar(10)
-  dt_criacao_oc   DateTime? @db.Timestamp(6)
-  usuario_criacao String?   @db.VarChar(20)
-  nome            String?   @db.VarChar(100)
-  email           String    @db.VarChar(150)
-  status          String    @default("PENDENTE") @db.VarChar(20)
-  dt_envio        DateTime? @db.Timestamp(6)
-  tentativas      Int?      @default(0) @db.SmallInt
-  erro_msg        String?   @db.VarChar(500)
-  dt_criacao      DateTime  @default(now()) @db.Timestamp(6)
-  dt_atualizacao  DateTime  @default(now()) @db.Timestamp(6)
+  id                   Int       @id @default(autoincrement())
+  cd_solicitacao       Int
+  controle_sc          String?   @db.VarChar(10)
+  dt_criacao_sc        DateTime? @db.Timestamp(6)
+  cd_ordem_compra      String    @unique(map: "uq_cd_ordem_compra") @db.VarChar(20)
+  controle_oc          String?   @db.VarChar(10)
+  dt_criacao_oc        DateTime? @db.Timestamp(6)
+  usuario_criacao      String?   @db.VarChar(20)
+  nome_solicitante     String?   @db.VarChar(100)
+  email                String    @db.VarChar(150)
+  status               String    @default("PENDENTE") @db.VarChar(20)
+  dt_envio             DateTime? @db.Timestamp(6)
+  tentativas           Int?      @default(0) @db.SmallInt
+  erro_msg             String?   @db.VarChar(500)
+  dt_criacao           DateTime  @default(now()) @db.Timestamp(6)
+  dt_atualizacao       DateTime  @default(now()) @db.Timestamp(6)
+  cd_usuario_aprovador String?   @db.VarChar(20)
+  nome_aprovador       String?   @db.VarChar(100)
 
+  @@index([cd_usuario_aprovador], map: "idx_oc_email_log_aprovador")
   @@index([email], map: "idx_oc_email_log_email")
   @@index([cd_ordem_compra], map: "idx_oc_email_log_oc")
   @@index([cd_solicitacao], map: "idx_oc_email_log_sc")
   @@index([status], map: "idx_oc_email_log_status")
   @@index([usuario_criacao], map: "idx_oc_email_log_usuario")
+  @@schema("dw")
 }

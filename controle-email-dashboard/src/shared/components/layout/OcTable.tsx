@@ -1,46 +1,69 @@
 // components/OcTable.tsx
-import { useEffect, useState } from 'react'
-import { ChevronRight, ChevronDown, Send, Search, Calendar, ChevronDown as SelectIcon } from 'lucide-react'
-import axios from 'axios'
+import { useEffect, useState } from "react";
+import {
+  ChevronRight,
+  ChevronDown,
+  Send,
+  Search,
+  Calendar,
+  ChevronDown as SelectIcon,
+} from "lucide-react";
+import axios from "axios";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type StatusOC = 'enviado' | 'pendente' | 'erro' | 'reenviado'
-type StatusGrupo = 'enviado' | 'parcial' | 'erro' | 'pendente'
-
 interface OC {
-  cd_ordem_compra: string
-  cd_solicitacao: string
-  controle_oc: string
-  dt_criacao_oc: string
-  status: StatusOC
+  CD_ORDEM_COMPRA: string;
+  CD_SOLICITACAO: number;
+  CONTROLE_OC: string;
+  STATUS: string;
+  ERRO_MSG: string;
+  TENTATIVAS_ENVIO: number;
+  DT_ENVIO_EMAIL: string;
+  DT_CRIACAO_OC: string;
 }
 
 interface Grupo {
-  nome: string
-  email: string
-  status: StatusGrupo
-  ultimo_envio: string
-  ocs: OC[]
+  EMAIL: string;
+  NOME_APROVADOR: string;
+  NOME_SOLICITANTE: string;
+  OCS: OC[];
 }
 
 // ─── Badge ───────────────────────────────────────────────────────────────────
 
 const badgeConfig: Record<string, { label: string; className: string }> = {
-  enviado:   { label: 'Enviado',   className: 'bg-[#E8F5E8] text-[#2E7D32] border border-[#C5E1C5]' },
-  reenviado: { label: 'Reenviado', className: 'bg-[#E8F0F5] text-[#1565C0] border border-[#B3CDE0]' },
-  parcial:   { label: 'Parcial',   className: 'bg-[#F3E8FF] text-[#7B1FA2] border border-[#D9B3F0]' },
-  pendente:  { label: 'Pendente',  className: 'bg-[#FFF8E1] text-[#F57F17] border border-[#FFE082]' },
-  erro:      { label: 'Erro',      className: 'bg-[#FFEBEE] text-[#C62828] border border-[#FFCDD2]' },
-}
+  ENVIADO: {
+    label: "Enviado",
+    className: "bg-[#E8F5E8] text-[#2E7D32] border border-[#C5E1C5]",
+  },
+  REENVIADO: {
+    label: "Reenviado",
+    className: "bg-[#E8F0F5] text-[#1565C0] border border-[#B3CDE0]",
+  },
+  PARCIAL: {
+    label: "Parcial",
+    className: "bg-[#F3E8FF] text-[#7B1FA2] border border-[#D9B3F0]",
+  },
+  PENDENTE: {
+    label: "Pendente",
+    className: "bg-[#FFF8E1] text-[#F57F17] border border-[#FFE082]",
+  },
+  ERRO: {
+    label: "Erro",
+    className: "bg-[#FFEBEE] text-[#C62828] border border-[#FFCDD2]",
+  },
+};
 
 function Badge({ status }: { status: string }) {
-  const cfg = badgeConfig[status] ?? badgeConfig.pendente
+  const cfg = badgeConfig[status] ?? badgeConfig.pendente;
   return (
-    <span className={`inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium ${cfg.className}`}>
+    <span
+      className={`inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium ${cfg.className}`}
+    >
       {cfg.label}
     </span>
-  )
+  );
 }
 
 // ─── Avatar ──────────────────────────────────────────────────────────────────
@@ -50,84 +73,10 @@ function Avatar({ iniciais }: { iniciais: string }) {
     <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#D6E8D6] text-[#3A7A3A] text-xs font-bold shrink-0">
       {iniciais}
     </span>
-  )
+  );
 }
 
-
-
-// {
-// "EMAIL": "gabriel.oliveira@castanhal.com.br",
-// "NOME_SOLICITANTE": "SHERLLON G DE OLIVEIRA CHAGAS",
-// "OCS": [
-//     {
-//     "CD_ORDEM_COMPRA": "24416",
-//     "CD_SOLICITACAO":179273,  
-//     "CONTROLE_OC":"35",
-//     "DT_CRIACAO_OC": "2026-06-18T11:00:00.000Z",
-//     "DT_ENVIO_EMAIL": "2026-06-19T19:09:24.199Z",
-//     "TENTATIVAS_ENVIO":0,
-//     "ERRO_MSG": null
-//     },
-//     {
-//     "CD_ORDEM_COMPRA":"24414",
-//     "CD_SOLICITACAO": 179289, 
-//     "CONTROLE_OC": "20",
-//     "DT_CRIACAO_OC": "2026-06-18T06:00:00.000Z", 
-//     "DT_ENVIO_EMAIL":null, 
-//     "TENTATIVAS_ENVIO": 0,
-//     "ERRO_MSG": null 
-//     }  
-//   ]
-// }
-
-// ─── Dados mock ──────────────────────────────────────────────────────────────
-
-const MOCK: Grupo[] = [
-  {
-    nome: 'Sherllon G. Chagas', email: 'gabriel.oliveira@castanhal.c...',
-    status: 'enviado', ultimo_envio: '22/06 08:01',
-    ocs: [
-      { cd_ordem_compra: '24416', cd_solicitacao: '179273', controle_oc: '35', dt_criacao_oc: '22/06/2026', status: 'enviado' },
-      { cd_ordem_compra: '24414', cd_solicitacao: '179289', controle_oc: '20', dt_criacao_oc: '22/06/2026', status: 'enviado' },
-      { cd_ordem_compra: '24418', cd_solicitacao: '179388', controle_oc: '35', dt_criacao_oc: '22/06/2026', status: 'reenviado' },
-    ]
-  },
-  {
-    nome: 'Stefanny G. Pessoa', email: 'stefanny.pessoa@castanhal.co...',
-    status: 'parcial', ultimo_envio: '—',
-    ocs: [
-      { cd_ordem_compra: '24430', cd_solicitacao: '179452', controle_oc: '10', dt_criacao_oc: '22/06/2026', status: 'pendente' },
-      { cd_ordem_compra: '24431', cd_solicitacao: '179455', controle_oc: '10', dt_criacao_oc: '22/06/2026', status: 'erro' },
-    ]
-  },
-  {
-    nome: 'Karyna A. da Silva', email: 'karyna.silva@castanhal.com.b...',
-    status: 'enviado', ultimo_envio: '22/06 08:03',
-    ocs: [
-      { cd_ordem_compra: '24433', cd_solicitacao: '179606', controle_oc: '10', dt_criacao_oc: '22/06/2026', status: 'enviado' },
-    ]
-  },
-{
-    nome: 'Sherllon G. Chagas', email: 'gabriel.oliveira@castanhal.c...',
-    status: 'enviado', ultimo_envio: '22/06 08:01',
-    ocs: [
-      { cd_ordem_compra: '24416', cd_solicitacao: '179273', controle_oc: '35', dt_criacao_oc: '22/06/2026', status: 'enviado' },
-      { cd_ordem_compra: '24414', cd_solicitacao: '179289', controle_oc: '20', dt_criacao_oc: '22/06/2026', status: 'enviado' },
-      { cd_ordem_compra: '24418', cd_solicitacao: '179388', controle_oc: '35', dt_criacao_oc: '22/06/2026', status: 'reenviado' },
-    ]
-  },
-  {
-    nome: 'Sherllon G. Chagas', email: 'gabriel.oliveira@castanhal.c...',
-    status: 'enviado', ultimo_envio: '22/06 08:01',
-    ocs: [
-      { cd_ordem_compra: '24416', cd_solicitacao: '179273', controle_oc: '35', dt_criacao_oc: '22/06/2026', status: 'enviado' },
-      { cd_ordem_compra: '24414', cd_solicitacao: '179289', controle_oc: '20', dt_criacao_oc: '22/06/2026', status: 'enviado' },
-      { cd_ordem_compra: '24418', cd_solicitacao: '179388', controle_oc: '35', dt_criacao_oc: '22/06/2026', status: 'reenviado' },
-    ]
-  },
-]
-
-const POR_PAGINA = 5
+const POR_PAGINA = 5;
 
 // ─── Linha de grupo ──────────────────────────────────────────────────────────
 
@@ -137,30 +86,30 @@ function GrupoRow({
   onToggle,
   onReenviar,
 }: {
-  grupo: Grupo
-  expanded: boolean
-  onToggle: () => void
-  onReenviar: (g: Grupo) => void
+  grupo: Grupo;
+  expanded: boolean;
+  onToggle: () => void;
+  onReenviar: (g: Grupo) => void;
 }) {
-  const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set())
+  const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
 
   function toggleOC(nr: string) {
-    setSelecionadas(prev => {
-      const next = new Set(prev)
-      next.has(nr) ? next.delete(nr) : next.add(nr)
-      return next
-    })
+    setSelecionadas((prev) => {
+      const next = new Set(prev);
+      next.has(nr) ? next.delete(nr) : next.add(nr);
+      return next;
+    });
   }
 
   function toggleTodas() {
-    setSelecionadas(prev =>
-      prev.size === grupo.ocs.length
+    setSelecionadas((prev) =>
+      prev.size === grupo.OCS?.length
         ? new Set()
-        : new Set(grupo.ocs.map(o => o.cd_ordem_compra))
-    )
+        : new Set(grupo.OCS.map((o) => o.CD_ORDEM_COMPRA)),
+    );
   }
 
-  const todasSelecionadas = selecionadas.size === grupo.ocs.length
+  const todasSelecionadas = selecionadas.size === grupo.OCS?.length;
 
   return (
     <>
@@ -170,23 +119,32 @@ function GrupoRow({
         onClick={onToggle}
       >
         <td className="pl-4 pr-2 py-4 w-8">
-          {expanded
-            ? <ChevronDown size={16} className="text-gray-400" />
-            : <ChevronRight size={16} className="text-gray-400" />}
+          {expanded ? (
+            <ChevronDown size={16} className="text-gray-400" />
+          ) : (
+            <ChevronRight size={16} className="text-gray-400" />
+          )}
         </td>
         <td className="py-4 pr-4">
           <div className="flex items-center gap-3">
-            <Avatar iniciais={grupo.nome.substring(0, 2)} />
-            <span className="font-semibold text-gray-900 text-sm">{grupo.nome}</span>
+            <Avatar iniciais={grupo.NOME_SOLICITANTE?.substring(0, 2)} />
+            <span className="font-semibold text-gray-900 text-sm">
+              {grupo.NOME_SOLICITANTE}
+            </span>
           </div>
         </td>
-        <td className="py-4 pr-4 text-sm text-gray-500">{grupo.email}</td>
-        <td className="py-4 pr-4 text-sm font-semibold text-gray-900">{grupo.ocs.length}</td>
-        <td className="py-4 pr-4"><Badge status={grupo.status} /></td>
-        <td className="py-4 pr-4 text-sm text-gray-500">{grupo.ultimo_envio}</td>
+        <td className="py-4 pr-4 text-sm text-gray-500">{grupo.EMAIL}</td>
+        <td className="py-4 pr-4 text-sm font-semibold text-gray-900">
+          {grupo.OCS?.length}
+        </td>
+        {/* <td className="py-4 pr-4"><Badge status={grupo.status} /></td>
+        <td className="py-4 pr-4 text-sm text-gray-500">{grupo.ultimo_envio}</td> */}
         <td className="py-4 pr-6">
           <button
-            onClick={e => { e.stopPropagation(); onReenviar(grupo) }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onReenviar(grupo);
+            }}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#2E7D32] border border-[#C5E1C5] rounded-full bg-[#F5FAF5] hover:bg-[#E8F5E8] transition-colors"
           >
             <Send size={12} />
@@ -216,33 +174,44 @@ function GrupoRow({
             </td>
           </tr>
 
-          {grupo.ocs.map(oc => (
-            <tr key={oc.cd_ordem_compra} className="bg-[#FAFAF8] border-b border-gray-100 hover:bg-[#F5F2EC] transition-colors">
+          {grupo.OCS?.map((oc) => (
+            <tr
+              key={oc.CD_ORDEM_COMPRA}
+              className="bg-[#FAFAF8] border-b border-gray-100 hover:bg-[#F5F2EC] transition-colors"
+            >
               <td className="pl-4" />
               <td className="py-3 pr-4">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={selecionadas.has(oc.cd_ordem_compra)}
-                    onChange={() => toggleOC(oc.cd_ordem_compra)}
+                    checked={selecionadas.has(oc.CD_ORDEM_COMPRA)}
+                    onChange={() => toggleOC(oc.CD_ORDEM_COMPRA)}
                     className="accent-[#3A7A3A] w-3.5 h-3.5 rounded"
+                    // style={{ accentColor: '#3A7A3A' }}
+                    // className="w-3.5 h-3.5 rounded cursor-pointer"
                   />
-                  <span className="text-sm text-gray-700 font-medium">OC {oc.cd_ordem_compra}</span>
+                  <span className="text-sm text-gray-700 font-medium">
+                    OC {oc.CD_ORDEM_COMPRA}
+                  </span>
                 </label>
               </td>
               <td className="py-3 pr-4 text-sm text-gray-400">
-                SC {oc.cd_solicitacao} · Controle {oc.controle_oc}
+                SC {oc.CD_SOLICITACAO} · Controle {oc.CONTROLE_OC}
               </td>
               <td />
-              <td className="py-3 pr-4"><Badge status={oc.status} /></td>
-              <td className="py-3 pr-4 text-sm text-gray-400">{oc.dt_criacao_oc}</td>
+              <td className="py-3 pr-4">
+                <Badge status={oc.STATUS} />
+              </td>
+              <td className="py-3 pr-4 text-sm text-gray-400">
+                {oc.DT_ENVIO_EMAIL}
+              </td>
               <td />
             </tr>
           ))}
         </>
       )}
     </>
-  )
+  );
 }
 
 // ─── Paginação ───────────────────────────────────────────────────────────────
@@ -253,13 +222,13 @@ function Paginacao({
   porPagina,
   onChange,
 }: {
-  pagina: number
-  total: number
-  porPagina: number
-  onChange: (p: number) => void
+  pagina: number;
+  total: number;
+  porPagina: number;
+  onChange: (p: number) => void;
 }) {
-  const totalPaginas = Math.ceil(total / porPagina)
-  if (totalPaginas <= 1) return null
+  const totalPaginas = Math.ceil(total / porPagina);
+  if (totalPaginas <= 1) return null;
 
   return (
     <div className="flex items-center justify-center gap-1 pt-2">
@@ -270,14 +239,14 @@ function Paginacao({
       >
         ‹
       </button>
-      {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(p => (
+      {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((p) => (
         <button
           key={p}
           onClick={() => onChange(p)}
           className={`w-8 h-8 text-sm rounded-md font-medium transition-colors ${
             p === pagina
-              ? 'bg-[#3A7A3A] text-white'
-              : 'text-gray-500 hover:bg-gray-100'
+              ? "bg-[#3A7A3A] text-white"
+              : "text-gray-500 hover:bg-gray-100"
           }`}
         >
           {p}
@@ -291,53 +260,85 @@ function Paginacao({
         ›
       </button>
     </div>
-  )
+  );
 }
 
 // ─── Componente principal ────────────────────────────────────────────────────
 
-export default function OcTable({ onReenviar }: { onReenviar: (g: Grupo) => void }) {
-  const [emailsOc, setEmailsOc] = useState<string[]>([])
+export default function OcTable({
+  onReenviar,
+}: {
+  onReenviar: (g: Grupo) => void;
+}) {
+  const [emailsOc, setEmailsOc] = useState<Grupo[]>([]);
 
   useEffect(() => {
     axios
-    .get("https://n8n.juta.eco.br/webhook-test/e5ad0182-f660-46a5-afe1-03ded43fc9f1")
-    .then((res) => {
-      setEmailsOc(res.data)
-    })
-    .catch((err) => {
-      console.error("Erro ao buscar emails de OC:", err)
-    })
-  }, [])
+      .get("http://localhost:3000/consultas")
+      .then((res) => {
+        setEmailsOc(res.data);
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar emails de OC:", err);
+      });
+  }, []);
 
-  const [expandidos, setExpandidos] = useState<Set<number>>(new Set([0]))
-  const [pagina, setPagina] = useState(1)
-  const [busca, setBusca] = useState('')
-  const [statusFiltro, setStatusFiltro] = useState('todos')
-  const [data, setData] = useState('2026-06-22')
+  const [expandidos, setExpandidos] = useState<Set<number>>(new Set([0]));
+  const [pagina, setPagina] = useState(1);
+  const [busca, setBusca] = useState("");
+  const [statusFiltro, setStatusFiltro] = useState("todos");
+  const [data, setData] = useState("");
 
-  const filtrados = MOCK.filter(g => {
-    const buscaOk = busca === '' ||
-      g.nome.toLowerCase().includes(busca.toLowerCase()) ||
-      g.ocs.some(o => o.cd_ordem_compra.includes(busca))
-    const statusOk = statusFiltro === 'todos' || g.status === statusFiltro
-    return buscaOk && statusOk
-  })
+  const filtrados = emailsOc.filter((g) => {
+    // Filtro por busca (nome do solicitante ou número da OC)
+    const buscaOk =
+      busca === "" ||
+      g.NOME_SOLICITANTE?.toLowerCase().includes(busca.toLowerCase()) ||
+      g.OCS?.some((o) => o.CD_ORDEM_COMPRA?.toString().includes(busca));
 
-  const paginados = filtrados.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA)
-  const agora = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    // Filtro por status — compara com o status de cada OC do grupo
+    const statusOk =
+      statusFiltro === "todos" ||
+      g.OCS?.some(
+        (o) => o.STATUS?.toUpperCase() === statusFiltro.toUpperCase(),
+      );
+
+    // Filtro por data — compara com a data de criação de cada OC do grupo
+    const dataOk =
+      data === "" ||
+      g.OCS?.some((o) => {
+        if (!o.DT_CRIACAO_OC) return false;
+        const dtOC = new Date(o.DT_CRIACAO_OC).toISOString().split("T")[0];
+        return dtOC === data;
+      });
+
+    return buscaOk && statusOk && dataOk;
+  });
+
+  const paginados = filtrados.slice(
+    (pagina - 1) * POR_PAGINA,
+    pagina * POR_PAGINA,
+  );
+  console.log(paginados)
+
+  const agora =
+    new Date().toLocaleDateString("pt-BR") +
+    " " +
+    new Date().toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
   function toggleExpandido(i: number) {
-    setExpandidos(prev => {
-      const next = new Set(prev)
-      next.has(i) ? next.delete(i) : next.add(i)
-      return next
-    })
+    setExpandidos((prev) => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
+    });
   }
 
   return (
     <div className="px-8 pb-8">
-
       {/* Filtros */}
       <div className="flex gap-3 mb-5 flex-wrap">
         <label className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-600 cursor-pointer">
@@ -345,24 +346,33 @@ export default function OcTable({ onReenviar }: { onReenviar: (g: Grupo) => void
           <input
             type="date"
             value={data}
-            onChange={e => { setData(e.target.value); setPagina(1) }}
+            onChange={(e) => {
+              setData(e.target.value);
+              setPagina(1);
+            }}
             className="bg-transparent outline-none text-sm text-gray-700 cursor-pointer"
-          />
+            />
         </label>
 
         <div className="relative flex items-center bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-600">
           <select
             value={statusFiltro}
-            onChange={e => { setStatusFiltro(e.target.value); setPagina(1) }}
+            onChange={(e) => {
+              setStatusFiltro(e.target.value);
+              setPagina(1);
+            }}
             className="appearance-none bg-transparent outline-none pr-5 cursor-pointer text-gray-700"
           >
             <option value="todos">Todos os status</option>
-            <option value="enviado">Enviado</option>
-            <option value="parcial">Parcial</option>
-            <option value="pendente">Pendente</option>
-            <option value="erro">Erro</option>
+            <option value="enviado">ENVIADO</option>
+            <option value="parcial">PARCIAL</option>
+            <option value="pendente">PENDENTE</option>
+            <option value="erro">ERRO</option>
           </select>
-          <SelectIcon size={14} className="absolute right-3 text-gray-400 pointer-events-none" />
+          <SelectIcon
+            size={14}
+            className="absolute right-3 text-gray-400 pointer-events-none"
+          />
         </div>
 
         <label className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-600 flex-1 min-w-[200px]">
@@ -371,7 +381,10 @@ export default function OcTable({ onReenviar }: { onReenviar: (g: Grupo) => void
             type="text"
             placeholder="Buscar solicitante ou OC..."
             value={busca}
-            onChange={e => { setBusca(e.target.value); setPagina(1) }}
+            onChange={(e) => {
+              setBusca(e.target.value);
+              setPagina(1);
+            }}
             className="bg-transparent outline-none w-full text-gray-700 placeholder:text-gray-400"
           />
         </label>
@@ -383,24 +396,35 @@ export default function OcTable({ onReenviar }: { onReenviar: (g: Grupo) => void
           <thead>
             <tr className="border-b border-gray-100">
               <th className="w-8" />
-              <th className="py-3 pr-4 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Solicitante</th>
-              <th className="py-3 pr-4 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">E-mail</th>
-              <th className="py-3 pr-4 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">OCs</th>
-              <th className="py-3 pr-4 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Status</th>
-              <th className="py-3 pr-4 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Último envio</th>
-              <th className="py-3 pr-6 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Ação</th>
+              <th className="py-3 pr-4 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+                Solicitante
+              </th>
+              <th className="py-3 pr-4 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+                E-mail
+              </th>
+              <th className="py-3 pr-4 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+                OCs
+              </th>
+              {/* <th className="py-3 pr-4 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Status</th>
+              <th className="py-3 pr-4 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Último envio</th> */}
+              <th className="py-3 pr-6 text-left text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+                Ação
+              </th>
             </tr>
           </thead>
           <tbody>
             {paginados.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-12 text-center text-sm text-gray-400">
+                <td
+                  colSpan={7}
+                  className="py-12 text-center text-sm text-gray-400"
+                >
                   Nenhum resultado encontrado.
                 </td>
               </tr>
             ) : (
               paginados.map((grupo, i) => {
-                const idxReal = (pagina - 1) * POR_PAGINA + i
+                const idxReal = (pagina - 1) * POR_PAGINA + i;
                 return (
                   <GrupoRow
                     key={idxReal}
@@ -409,7 +433,7 @@ export default function OcTable({ onReenviar }: { onReenviar: (g: Grupo) => void
                     onToggle={() => toggleExpandido(idxReal)}
                     onReenviar={onReenviar}
                   />
-                )
+                );
               })
             )}
           </tbody>
@@ -424,10 +448,11 @@ export default function OcTable({ onReenviar }: { onReenviar: (g: Grupo) => void
             onChange={setPagina}
           />
           <p className="text-xs text-[#8B7355]">
-            Mostrando {filtrados.length} de {MOCK.length} solicitantes · Última atualização: {agora}
+            Mostrando {filtrados.length} de {emailsOc?.length} solicitantes ·
+            Última atualização: {agora}
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }
