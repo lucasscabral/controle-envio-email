@@ -1,5 +1,5 @@
 // components/OcTable.tsx
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ChevronRight,
   ChevronDown,
@@ -203,7 +203,7 @@ function GrupoRow({
                 <Badge status={oc.STATUS} />
               </td>
               <td className="py-3 pr-4 text-sm text-gray-400">
-                {oc.DT_ENVIO_EMAIL}
+                Último envio:{oc.DT_ENVIO_EMAIL}
               </td>
               <td />
             </tr>
@@ -267,21 +267,11 @@ function Paginacao({
 
 export default function OcTable({
   onReenviar,
+  emailsOc
 }: {
   onReenviar: (g: Grupo) => void;
+  emailsOc: Grupo[] | any ;
 }) {
-  const [emailsOc, setEmailsOc] = useState<Grupo[]>([]);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/consultas")
-      .then((res) => {
-        setEmailsOc(res.data);
-      })
-      .catch((err) => {
-        console.error("Erro ao buscar emails de OC:", err);
-      });
-  }, []);
 
   const [expandidos, setExpandidos] = useState<Set<number>>(new Set([0]));
   const [pagina, setPagina] = useState(1);
@@ -289,7 +279,7 @@ export default function OcTable({
   const [statusFiltro, setStatusFiltro] = useState("todos");
   const [data, setData] = useState("");
 
-  const filtrados = emailsOc.filter((g) => {
+  const filtrados = emailsOc?.filter((g) => {
     // Filtro por busca (nome do solicitante ou número da OC)
     const buscaOk =
       busca === "" ||
@@ -315,7 +305,7 @@ export default function OcTable({
     return buscaOk && statusOk && dataOk;
   });
 
-  const paginados = filtrados.slice(
+  const paginados = filtrados?.slice(
     (pagina - 1) * POR_PAGINA,
     pagina * POR_PAGINA,
   );
@@ -413,7 +403,7 @@ export default function OcTable({
             </tr>
           </thead>
           <tbody>
-            {paginados.length === 0 ? (
+            {paginados?.length === 0 ? (
               <tr>
                 <td
                   colSpan={7}
@@ -423,7 +413,7 @@ export default function OcTable({
                 </td>
               </tr>
             ) : (
-              paginados.map((grupo, i) => {
+              paginados?.map((grupo, i) => {
                 const idxReal = (pagina - 1) * POR_PAGINA + i;
                 return (
                   <GrupoRow
@@ -443,12 +433,12 @@ export default function OcTable({
         <div className="px-6 py-4 border-t border-gray-100 flex flex-col items-center gap-3">
           <Paginacao
             pagina={pagina}
-            total={filtrados.length}
+            total={filtrados?.length}
             porPagina={POR_PAGINA}
             onChange={setPagina}
           />
           <p className="text-xs text-[#8B7355]">
-            Mostrando {filtrados.length} de {emailsOc?.length} solicitantes ·
+            Mostrando {filtrados?.length} de {emailsOc?.length} solicitantes ·
             Última atualização: {agora}
           </p>
         </div>
