@@ -3,7 +3,7 @@ services:
     build: ./controle-alerta-alcada-backend
     container_name: backend
     ports:
-      - "3000:3000"
+      - "4000:4000"
     env_file:
       - ./controle-alerta-alcada-backend/.env
     volumes:
@@ -13,7 +13,7 @@ services:
     build: ./controle-email-dashboard
     container_name: frontend
     ports:
-      - "3100:3100"
+      - "3100:80"
     depends_on:
       - backend
 
