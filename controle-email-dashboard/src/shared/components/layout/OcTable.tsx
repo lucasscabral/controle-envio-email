@@ -308,7 +308,6 @@ export default function OcTable({
     (pagina - 1) * POR_PAGINA,
     pagina * POR_PAGINA,
   );
-  console.log(paginados)
 
   const agora =
     new Date().toLocaleDateString("pt-BR") +

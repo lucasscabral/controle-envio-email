@@ -70,7 +70,6 @@ export default function ModalReenvio({
   const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
   const [emailCC, setEmailCC] = useState("");
   const [tentouConfirmar, setTentouConfirmar] = useState(false);
-  console.log("Grupo recebido no ModalReenvio:", grupo);
   const todasSelecionadas = selecionadas.size === grupo.OCS.length;
 
   function toggleOC(nr: string) {

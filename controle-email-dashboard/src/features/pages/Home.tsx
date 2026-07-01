@@ -2,9 +2,11 @@ import Header from "@/shared/components/layout/Header";
 import Hero from "@/shared/components/layout/Hero";
 import ModalReenvio from "@/shared/components/layout/ModalReenvio";
 import OcTable from "@/shared/components/layout/OcTable";
-import axios from "axios";
+// import axios from "axios";
+import api from "@/shared/services/api";
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle, XCircle, X } from "lucide-react"
+import axios from "axios";
 
 interface OC {
   CD_ORDEM_COMPRA:  string
@@ -107,7 +109,7 @@ export default function Home() {
 
   const buscarEmails = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3000/consultas");
+      const { data } = await api.get("/consultas");
       setEmailsOc(data);
     } catch (err) {
       console.error("Erro ao buscar emails de OC:", err);
@@ -131,7 +133,7 @@ export default function Home() {
         'https://n8n.juta.eco.br/webhook-test/75d7a613-29ed-4714-b1b2-21864a6d3f1b',
         payload
       )
-      console.log(data)
+      
       if(data.success){
         adicionar(
           'sucesso',
