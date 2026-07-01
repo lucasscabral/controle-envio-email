@@ -29,9 +29,9 @@ function StatsCard({ label, value, highlighted, valueColor }: StatsCardProps) {
 }
 
 interface DashboardStatsProps {
-  solicitantes: number
-  ocsEnviadas: number
-  comErro: number
+  solicitantes: number | undefined
+  ocsEnviadas: number | undefined
+  comErro: number | undefined
 }
 
 export default function Hero({
@@ -49,17 +49,17 @@ export default function Hero({
       <div className="mt-6 flex gap-4">
         <StatsCard
           label="Solicitantes"
-          value={solicitantes}
+          value={solicitantes || 0}
         />
         <StatsCard
           label="OCs enviadas"
-          value={ocsEnviadas}
+          value={ocsEnviadas || 0}
           highlighted
           valueColor="text-[#3A7A3A]"
         />
         <StatsCard
           label="Com erro"
-          value={comErro}
+          value={comErro || 0}
           valueColor="text-[#A33A3A]"
         />
       </div>

@@ -1,0 +1,21 @@
+services:
+  backend:
+    build: ./controle-alerta-alcada-backend
+    container_name: backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./controle-alerta-alcada-backend/.env
+    volumes:
+      - ./controle-alerta-alcada-backend:/app
+
+  frontend:
+    build: ./controle-email-dashboard
+    container_name: frontend
+    ports:
+      - "3100:3100"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

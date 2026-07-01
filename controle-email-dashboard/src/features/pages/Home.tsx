@@ -100,20 +100,22 @@ function useNotificacoes() {
 }
 
 export default function Home() {
-  const [emailsOc, setEmailsOc] = useState<Grupo | null>(null);
+  const [emailsOc, setEmailsOc] = useState<Grupo[] | null>(null);
   const { notificacoes, adicionar, remover } = useNotificacoes()
 
   const [grupoSelecionado, setGrupoSelecionado] = useState<any>(null)
 
+  const buscarEmails = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:3000/consultas");
+      setEmailsOc(data);
+    } catch (err) {
+      console.error("Erro ao buscar emails de OC:", err);
+    }
+  };
+
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/consultas")
-      .then((res) => {
-        setEmailsOc(res.data);
-      })
-      .catch((err) => {
-        console.error("Erro ao buscar emails de OC:", err);
-      });
+    buscarEmails();
   }, []);
 
   function handleReenviar(grupo: any) {
@@ -125,16 +127,26 @@ export default function Home() {
     setGrupoSelecionado(null)
 
     try {
-      await axios.post(
+      const {data} = await axios.post(
         'https://n8n.juta.eco.br/webhook-test/75d7a613-29ed-4714-b1b2-21864a6d3f1b',
         payload
       )
+      console.log(data)
+      if(data.success){
+        adicionar(
+          'sucesso',
+          'E-mail reenviado com sucesso',
+          `${payload.OCS.length} OC(s) enviada(s) para ${payload.EMAIL}${payload.EMAIL_CC ? ` com cópia para ${payload.EMAIL_CC}` : ''}.`
+        )
+      }else{
+        adicionar(
+        'erro',
+        'Erro ao reenviar',
+        'Não foi possível reenviar as OCs. Tente novamente.'
+        )
+      }
 
-      adicionar(
-        'sucesso',
-        'E-mail reenviado com sucesso',
-        `${payload.OCS.length} OC(s) enviada(s) para ${payload.EMAIL}${payload.EMAIL_CC ? ` com cópia para ${payload.EMAIL_CC}` : ''}.`
-      )
+      
     } catch (error) {
       adicionar(
         'erro',
@@ -142,11 +154,15 @@ export default function Home() {
         'Não foi possível reenviar as OCs. Tente novamente.'
       )
       console.error('Erro ao reenviar OCs:', error)
+    } finally{
+      // Atualiza os dados da tela
+      await buscarEmails();
     }
   }
-    // ─── Calcula stats a partir dos dados da API ──────────────────────────────
+  
+  // ─── Calcula stats a partir dos dados da API ──────────────────────────────
   const stats = useMemo(() => {
-    const todasOcs = emailsOc?.flatMap(g => g.OCS ?? [])
+    const todasOcs = emailsOc?.flatMap((g) => g.OCS ?? []) ?? []
 
     return {
       solicitantes: emailsOc?.length,

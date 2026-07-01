@@ -8,7 +8,6 @@ import {
   Calendar,
   ChevronDown as SelectIcon,
 } from "lucide-react";
-import axios from "axios";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -279,24 +278,24 @@ export default function OcTable({
   const [statusFiltro, setStatusFiltro] = useState("todos");
   const [data, setData] = useState("");
 
-  const filtrados = emailsOc?.filter((g) => {
+  const filtrados = emailsOc?.filter((g:Grupo) => {
     // Filtro por busca (nome do solicitante ou número da OC)
     const buscaOk =
       busca === "" ||
       g.NOME_SOLICITANTE?.toLowerCase().includes(busca.toLowerCase()) ||
-      g.OCS?.some((o) => o.CD_ORDEM_COMPRA?.toString().includes(busca));
+      g.OCS?.some((o:OC) => o.CD_ORDEM_COMPRA?.toString().includes(busca));
 
     // Filtro por status — compara com o status de cada OC do grupo
     const statusOk =
       statusFiltro === "todos" ||
       g.OCS?.some(
-        (o) => o.STATUS?.toUpperCase() === statusFiltro.toUpperCase(),
+        (o:OC) => o.STATUS?.toUpperCase() === statusFiltro.toUpperCase(),
       );
 
     // Filtro por data — compara com a data de criação de cada OC do grupo
     const dataOk =
       data === "" ||
-      g.OCS?.some((o) => {
+      g.OCS?.some((o:OC) => {
         if (!o.DT_CRIACAO_OC) return false;
         const dtOC = new Date(o.DT_CRIACAO_OC).toISOString().split("T")[0];
         return dtOC === data;
@@ -413,7 +412,7 @@ export default function OcTable({
                 </td>
               </tr>
             ) : (
-              paginados?.map((grupo, i) => {
+              paginados?.map((grupo:Grupo, i:number) => {
                 const idxReal = (pagina - 1) * POR_PAGINA + i;
                 return (
                   <GrupoRow

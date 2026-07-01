@@ -13,7 +13,7 @@ export const prisma = new PrismaClient({
 });
 
 prisma.$connect().then(() => {
-  console.log('Connected to the database successfully.');
-}).catch((err) => {
-  console.error('Error connecting to the database:', err);
+  console.log('Conectado ao banco de dados com sucesso!');
+}).catch((err:any) => {
+  console.error('Erro ao conectar ao banco de dados:', err);
 });
