@@ -353,8 +353,8 @@ export default function OcTable({
           >
             <option value="todos">Todos os status</option>
             <option value="enviado">ENVIADO</option>
-            <option value="parcial">PARCIAL</option>
-            <option value="pendente">PENDENTE</option>
+            {/* <option value="parcial">PARCIAL</option>
+            <option value="pendente">PENDENTE</option> */}
             <option value="erro">ERRO</option>
           </select>
           <SelectIcon
