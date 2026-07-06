@@ -1,6 +1,6 @@
 # Dockerfile -> backend
 
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN npx prisma generate
 
 EXPOSE 4000
 
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npx prisma generate && npm run start"]
 
 # FROM node:20-alpine AS builder
 

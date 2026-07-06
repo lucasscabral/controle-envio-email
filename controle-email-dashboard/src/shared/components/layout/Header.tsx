@@ -1,7 +1,7 @@
 // Header.tsx
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
-import LogoCTC from "@/assets/img/Logo Castanhal png 4 2 1.png";
+import LogoCTC from "@/assets/img/Logo_Castanhal.png";
 
 interface HeaderProps {
   onAtualizar?: () => Promise<void>;
