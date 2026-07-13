@@ -206,7 +206,7 @@ export default function ModalReenvio({
               type="email"
               value={emailCC}
               onChange={(e) => setEmailCC(e.target.value)}
-              placeholder="outro@empresa.com.br"
+              placeholder="outro@castanhal.com.br"
               className="w-full bg-[#F5F2EC] border-0 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#3A7A3A]/30 transition"
             />
           </div>
