@@ -144,7 +144,7 @@ function GrupoRow({
               e.stopPropagation();
               onReenviar(grupo);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#2E7D32] border border-[#C5E1C5] rounded-full bg-[#F5FAF5] hover:bg-[#E8F5E8] transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#2E7D32] border border-[#C5E1C5] rounded-full bg-[#F5FAF5] hover:bg-[#E8F5E8] transition-colors cursor-pointer"
           >
             <Send size={12} />
             Reenviar
