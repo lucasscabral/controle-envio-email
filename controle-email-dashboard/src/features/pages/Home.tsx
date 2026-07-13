@@ -74,7 +74,7 @@ export default function Home() {
 
     try {
       const { data } = await axios.post(
-        "https://n8n.juta.eco.br/webhook-test/75d7a613-29ed-4714-b1b2-21864a6d3f1b",
+        "https://webhook.juta.eco.br/webhook/75d7a613-29ed-4714-b1b2-21864a6d3f1b",
         payload,
       );
 
