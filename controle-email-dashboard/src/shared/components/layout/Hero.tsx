@@ -58,7 +58,7 @@ export default function Hero({
           valueColor="text-[#3A7A3A]"
         />
         <StatsCard
-          label="Com erro"
+          label="Com erro no envio"
           value={comErro || 0}
           valueColor="text-[#A33A3A]"
         />
