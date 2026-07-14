@@ -90,25 +90,6 @@ function GrupoRow({
   onToggle: () => void;
   onReenviar: (g: Grupo) => void;
 }) {
-  const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
-
-  function toggleOC(nr: string) {
-    setSelecionadas((prev) => {
-      const next = new Set(prev);
-      next.has(nr) ? next.delete(nr) : next.add(nr);
-      return next;
-    });
-  }
-
-  function toggleTodas() {
-    setSelecionadas((prev) =>
-      prev.size === grupo.OCS?.length
-        ? new Set()
-        : new Set(grupo.OCS.map((o) => o.CD_ORDEM_COMPRA)),
-    );
-  }
-
-  const todasSelecionadas = selecionadas.size === grupo.OCS?.length;
 
   return (
     <>
@@ -136,8 +117,6 @@ function GrupoRow({
         <td className="py-4 pr-4 text-sm font-semibold text-gray-900">
           {grupo.OCS?.length}
         </td>
-        {/* <td className="py-4 pr-4"><Badge status={grupo.status} /></td>
-        <td className="py-4 pr-4 text-sm text-gray-500">{grupo.ultimo_envio}</td> */}
         <td className="py-4 pr-6">
           <button
             onClick={(e) => {
@@ -156,22 +135,6 @@ function GrupoRow({
       {expanded && (
         <>
           {/* Cabeçalho das filhas */}
-          {/* <tr className="bg-[#F5F2EC]">
-            <td className="pl-4" />
-            <td colSpan={6} className="py-2 pr-6">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={todasSelecionadas}
-                  onChange={toggleTodas}
-                  className="accent-[#3A7A3A] w-3.5 h-3.5 rounded"
-                />
-                <span className="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
-                  Selecionar todas as OCs
-                </span>
-              </label>
-            </td>
-          </tr> */}
 
           {grupo.OCS?.map((oc) => (
             <tr
@@ -183,11 +146,7 @@ function GrupoRow({
                 <label className="flex items-center gap-3 ">
                   <input
                     type="text"
-                    // checked={selecionadas.has(oc.CD_ORDEM_COMPRA)}
-                    onChange={() => toggleOC(oc.CD_ORDEM_COMPRA)}
                     className="w-3.5 h-3.5"
-                    // style={{ accentColor: '#3A7A3A' }}
-                    // className="w-3.5 h-3.5 rounded cursor-pointer"
                   />
                   <span className="text-sm text-gray-700 font-medium">
                     OC {oc.CD_ORDEM_COMPRA}
