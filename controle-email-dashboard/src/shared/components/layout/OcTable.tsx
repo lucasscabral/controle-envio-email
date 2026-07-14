@@ -132,7 +132,7 @@ function GrupoRow({
             </span>
           </div>
         </td>
-        <td className="py-4 pr-4 text-sm text-gray-500">{grupo.EMAIL}</td>
+        <td className="py-4 pr-4 text-sm text-gray-500 flex items-center">{grupo.EMAIL}</td>
         <td className="py-4 pr-4 text-sm font-semibold text-gray-900">
           {grupo.OCS?.length}
         </td>
@@ -156,7 +156,7 @@ function GrupoRow({
       {expanded && (
         <>
           {/* Cabeçalho das filhas */}
-          <tr className="bg-[#F5F2EC]">
+          {/* <tr className="bg-[#F5F2EC]">
             <td className="pl-4" />
             <td colSpan={6} className="py-2 pr-6">
               <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -171,7 +171,7 @@ function GrupoRow({
                 </span>
               </label>
             </td>
-          </tr>
+          </tr> */}
 
           {grupo.OCS?.map((oc) => (
             <tr
@@ -180,12 +180,12 @@ function GrupoRow({
             >
               <td className="pl-4" />
               <td className="py-3 pr-4">
-                <label className="flex items-center gap-3 cursor-pointer">
+                <label className="flex items-center gap-3 ">
                   <input
-                    type="checkbox"
-                    checked={selecionadas.has(oc.CD_ORDEM_COMPRA)}
+                    type="text"
+                    // checked={selecionadas.has(oc.CD_ORDEM_COMPRA)}
                     onChange={() => toggleOC(oc.CD_ORDEM_COMPRA)}
-                    className="accent-[#3A7A3A] w-3.5 h-3.5 rounded"
+                    className="w-3.5 h-3.5"
                     // style={{ accentColor: '#3A7A3A' }}
                     // className="w-3.5 h-3.5 rounded cursor-pointer"
                   />

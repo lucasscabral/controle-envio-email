@@ -108,14 +108,14 @@ export default function ModalReenvio({
   return (
     /* Backdrop */
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden h-80vh ">
-        {/* Header */}
-        <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh]">
+        {/* Header — fixo no topo */}
+        <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#E8F5E8] flex items-center justify-center shrink-0">
               <Send size={18} className="text-[#3A7A3A]" />
@@ -135,13 +135,16 @@ export default function ModalReenvio({
           </button>
         </div>
 
-        <div className="px-6 py-5 space-y-5">
+        {/* Corpo — scrollável */}
+        <div className="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0">
           {/* E-mail principal */}
           <div className="bg-[#F5F2EC] rounded-xl px-4 py-3 text-sm text-gray-700">
             <span className="font-medium text-gray-800">
-              E-mail principal:{" "}
+              E-mail gestor imediato:{" "}
             </span>
-            <span className="text-[#3A7A3A] font-medium">{grupo.EMAIL}</span>
+            <span className="text-[#3A7A3A] font-medium break-all">
+              {grupo.EMAIL}
+            </span>
           </div>
 
           {/* OCs */}
@@ -149,6 +152,9 @@ export default function ModalReenvio({
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-semibold text-gray-800">
                 OCs a reenviar
+                <span className="ml-2 text-xs font-normal text-gray-400">
+                  ({grupo.OCS.length} OC{grupo.OCS.length > 1 ? "s" : ""})
+                </span>
               </span>
               <button
                 onClick={toggleTodas}
@@ -165,13 +171,14 @@ export default function ModalReenvio({
                   <label
                     key={oc.CD_ORDEM_COMPRA}
                     className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors select-none
-                      ${marcada ? "bg-[#F5FAF5]" : "bg-white hover:bg-gray-50"}`}
+                  ${marcada ? "bg-[#F5FAF5]" : "bg-white hover:bg-gray-50"}`}
                   >
                     <input
                       type="checkbox"
                       checked={marcada}
                       onChange={() => toggleOC(oc.CD_ORDEM_COMPRA)}
-                      className="accent-[#3A7A3A] w-4 h-4 rounded shrink-0"
+                      style={{ accentColor: "#3A7A3A" }}
+                      className="w-4 h-4 rounded shrink-0 cursor-pointer"
                     />
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <span className="text-sm font-semibold text-gray-800 shrink-0">
@@ -187,7 +194,6 @@ export default function ModalReenvio({
               })}
             </div>
 
-            {/* Validação */}
             {semSelecao && (
               <div className="flex items-center gap-1.5 mt-2 text-[#C62828] text-xs">
                 <AlertCircle size={13} />
@@ -212,21 +218,27 @@ export default function ModalReenvio({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 pb-6">
-          <button
-            onClick={onClose}
-            className="px-5 py-2.5 text-sm font-medium text-gray-600 bg-[#F0EDE8] hover:bg-[#E8E4DC] rounded-full transition-colors cursor-pointer"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleConfirmar}
-            className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-[#3A7A3A] hover:bg-[#2E6B2E] rounded-full transition-colors cursor-pointer"
-          >
-            <Send size={14} />
-            Confirmar reenvio
-          </button>
+        {/* Footer — fixo no rodapé */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 shrink-0">
+          <span className="text-xs text-gray-400">
+            {selecionadas.size} de {grupo.OCS.length} selecionada
+            {selecionadas.size !== 1 ? "s" : ""}
+          </span>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="px-5 py-2.5 text-sm font-medium text-gray-600 bg-[#F0EDE8] hover:bg-[#E8E4DC] rounded-full transition-colors cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleConfirmar}
+              className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-[#3A7A3A] hover:bg-[#2E6B2E] rounded-full transition-colors cursor-pointer"
+            >
+              <Send size={14} />
+              Confirmar reenvio
+            </button>
+          </div>
         </div>
       </div>
     </div>
